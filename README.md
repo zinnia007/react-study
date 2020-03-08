@@ -274,4 +274,176 @@ class ChildComp extends React.Component {
     ComponentDidUpdate: 组件已经更新
     ComponentWillUnmount: 组件将要卸载
 ```
+#### 插槽
+```
+    在组件中写入内容，这些内容可以被识别和控制，react需要自己实现
+    原理：
+        组件中写入的html可以传入props
+```
 
+#### 路由
+
+```
+    react-router-dom
+    npm i react-router-dom
+    
+    ReactRouter三大组件
+        Router: 所有路由的根组件（底层组件），包裹路由规则的最外层容器
+            basename: 设置路由的根路径
+            可以写多个路由router
+        Route:
+        
+        Link: 路由跳转的组件
+            to ：页面的跳转，可以直接写路径，或者路由对象
+            replace: 点击链接之后，将新地址替换中原地址（不能回退到源地址）,重定向
+            
+    动态路由的实现 /：id
+        
+    【如果要精确匹配，那么可以在route上设置exact属性】
+```
+
+#### redux
+```
+    数据状态管理
+    
+    Store:数据仓库
+    State:一个数据对象，应用中所需要的数据，数据仓库中的所有数据都放在一个state中
+    Action:一个动作， 触发数据改变的方法
+    Dispatch:将动作触发撑方法
+    Reducer：是一个函数，通过获取动作改变数据，生成一个新state，从而改变页面
+    
+```
+```
+    安装： npm i redux --s
+    
+    初始化数据
+    
+     // 创建仓库
+      const store = createSrore(reducer) 
+      
+      // reducer 函数，通过动作创建新的state
+      const reducer = function(state={num:0},action) {
+          
+      }
+          
+    获取数据
+    
+    修改数据
+```
+```
+/**
+ * redux的使用
+ */
+// 第一步：安装 ，npm i redux --s
+// 第二部：引入
+import Redux, {createStore} from 'redux'
+// 第三步：创建仓库
+    // reducer 是一个函数,通过动作action来返回新的state数据
+const reducer = function (state ={ num: 0 },action) {
+  switch(action.type) {
+    case 'add':console.log(state.num); state.num ++ ;break;
+    case 'sub':state.num -- ;break;
+    default:break;
+  }
+  return {...state}
+}
+const store = createStore(reducer) 
+
+function add () {
+  store.dispatch({type:'add'})
+}
+function sub () {
+  store.dispatch({type:'sub'})
+
+}
+class ParentComp extends React.Component {
+    render () {
+      return (
+        <div>
+            当前数字：{store.getState().num}
+            <button onClick={add}>num+1</button>
+            <button onClick={sub}>num-1</button>
+        </div>
+      )
+    }
+}
+
+// 监听state值得改变
+store.subscribe(() => {
+  ReactDOM.render(<ParentComp  />, document.getElementById('root'));
+})
+ReactDOM.render(<ParentComp  />, document.getElementById('root'));
+```
+#### react-redux
+`第一步：安装 npm i react-redux --s`
+```
+/**
+ * react-redux的用法
+ */
+// 1.安装 npm i react-redux --s
+// 2.引入 react-redux
+import {createStore}from 'redux'
+import {Provider, connect } from 'react-redux'
+
+// 3.创建一个store仓库
+const reducer = function (state = {num:0}, action) {
+    switch (action.type) {
+      case 'add': state.num ++;break;
+      default: break;
+    }
+    return {...state}
+}
+const store = createStore(reducer)
+
+// 4.数据的获取以及数据的修改
+// 将state数据映射到组件prop中，将修改数据的方法映射到组件的props中
+  // state映射到props
+  function mapStateToProps (state) {
+    return {
+      value:state.num
+    }
+  }
+  // 修改数据的方法映射到props
+  const addAction = {
+    type:'add'
+  }
+  function mapDispatchToProps (dispatch) {
+    return {
+      onAddClick: () => {
+        dispatch(addAction)
+      }
+    }
+  }
+  
+  class ParentComp extends React.Component {
+    constructor (props) {
+      super(props)
+    }
+      render () {
+        // 通过props 获取state中的数据
+        let value = this.props.value
+        let onAddClick = this.props.onAddClick
+  
+        console.log(value);
+        return (
+          <div>
+            num:{value}
+            <button onClick={onAddClick}>点击+1</button>
+          </div>
+        )
+      }
+  }
+ // 5.将这两个方法关联到组件
+  const NewComp = connect (
+      mapStateToProps,
+      mapDispatchToProps
+  )(ParentComp)
+
+  // 6.通过provider 取得数据渲染组件
+ReactDOM.render(
+  <Provider store = {store}>
+    <NewComp></NewComp>
+  </Provider>
+  , document.getElementById('root'));
+
+```
